@@ -30,15 +30,14 @@ python setup.py install
 
 ## Run
 ```
-OVarCall [-h] [--version] -1 BAM1 [-2 BAM2] -o OUTPUT -r REF_FA -s SAMTOOLS_PATH -p PARAMETER_SETTINGS [-R REGION] [-l LOG_LEVEL] [-u]
+OVarCall [-h] [--version] -1 BAM1 -2 BAM2 -o OUTPUT -r REF_FA -s SAMTOOLS_PATH -p PARAMETER_SETTINGS [-R REGION] [-l LOG_LEVEL]
 ```
 
--**-1**: Input tumor bam path
--**-2**: Input normal bam path
--**-o**: Output file path
--**-r**: Reference fasta file path
--**-s**: Samtools path 
--**-p**: Parameter settings path , ex) ./OVarCall.ini
--**-R**: Genomic regions , ex) chr1:1000-2000
--**-l**: Loglevel, ex) CRITICAL,ERROR,WARNING,INFO,DEBUG
--**-u**: Ignore normal bam data for statistical inference. Normal bam is used for candidate position filtering
+-**-1**: Input tumor bam path.
+-**-2**: Input normal bam path.
+-**-o**: Output file path.
+-**-r**: Reference fasta file path.
+-**-s**: Samtools path.
+-**-p**: Parameter settings path , ex) ./OVarCall.ini.
+-**-R**: Genomic regions , ex) chr1:1000-2000.
+-**-l**: Loglevel, ex) CRITICAL,ERROR,WARNING,INFO,DEBUG.
