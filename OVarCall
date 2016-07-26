@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(prog="OVarCall")
 parser.add_argument("--version", action="version", version="OVarCall-0.1.0")
 
 parser.add_argument('-1', '--bam1', help='1st bam file ( disease )', type=str, default=None, required=True)
-parser.add_argument('-2', '--bam2', help='2nd bam file ( control )', type=str, default=None)
+parser.add_argument('-2', '--bam2', help='2nd bam file ( control )', type=str, default=None, required=True)
 parser.add_argument('-o', '--output', help='Output text file', type=str, default=None, required=True)
 parser.add_argument('-r', '--ref_fa', help='Reference genome in fasta format', type=str, default=None, required=True)
 parser.add_argument('-s', '--samtools_path', type=str, default=None, required=True)
