@@ -21,8 +21,8 @@ Python(>=2.7), pysam, scipy
 
 ##  Install
 ```
-git clone https://github.com/takumorizo/OVarCallPackage
-cd OVarCallPackage
+git clone https://github.com/takumorizo/OVarCall
+cd OVarCall
 python setup.py build
 python setup.py install
 ```

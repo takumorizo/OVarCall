@@ -24,11 +24,9 @@ def runOVar(args):
 
     filterParamsT = {}
     filterParamsT.update(dict(config.items('tumor')))
-    # filterParamsT['minBQ'] = args.base_quality
 
     filterParamsN = {}
     filterParamsN.update(dict(config.items('normal')))
-    # filterParamsN['minBQ'] = args.base_quality
 
     filterTumor = PileUpFilter(filterParamsT)
     filterNormal = PileUpFilter(filterParamsN)
@@ -38,14 +36,11 @@ def runOVar(args):
     settingOVar['minMapQ'] = 30
     settingOVar.update(dict(config.items('calculation')))
 
-    # settingOVar['minBQ'] = args.base_quality
-    # settingOVar['minMapQ'] = args.mapping_quality
     ovarCall = OVarCall(settingOVar)
     tumorBamDao = BamDAO(args.bam1, settingOVar)
     normalBamDao = BamDAO(args.bam2, settingOVar)
     
     with tumorBamDao.openBam(), normalBamDao.openBam(), open(args.output, 'wb') as outputFile, open(os.devnull, 'wb') as FNULL:
-        # logging.debug(str(ovarCall.__dict__))
 
         cmd_list = [args.samtools_path, 'mpileup', '-q',
                     str(settingOVar['minMapQ']), '-BQ', '0', '-d', '10000000', '-f', args.ref_fa, args.bam1, args.bam2]
@@ -57,7 +52,6 @@ def runOVar(args):
         lineCount = 0
 
         outputFile.writelines("TYPE\tchr\tpos\tref\tobs\tscoreWithOverlap\tscoreWithoutOverlap\tTumorPileup≠\tNormalPileup\n")
-        
         for line in end_of_pipe:
             try:
                 lineCount += 1
