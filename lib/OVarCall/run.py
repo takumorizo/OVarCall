@@ -11,6 +11,18 @@ import re
 import ConfigParser
 
 
+def getHeader(withNormal):
+    headerCols = ["TYPE","Chr","pos","ref","obs","scoreWithOverlap","scoreWithoutOverlap","TumorPileup"]
+    if withNormal :
+        headerCols.append("NormalPileup")
+    outputString = '\t'.join(map(str, headerCols))
+    outputString = outputString + '\n'
+    result.writelines(outputString)
+    return outputString
+
+def convertToOutput(ansList):
+    pass    
+
 def runOVar(args):
 
     level = logging.getLevelName(args.log_level)
@@ -46,6 +58,8 @@ def runOVar(args):
         
         with tumorBamDao.openBam(), normalBamDao.openBam(), open(args.output, 'wb') as outputFile, open(os.devnull, 'wb') as FNULL:
             # logging.debug(str(ovarCall.__dict__))
+
+            outputFile.writelines(getHeader(True))
 
             cmd_list = [args.samtools_path, 'mpileup', '-q',
                         str(settingOVar['minMapQ']), '-BQ', '0', '-d', '10000000', '-f', args.ref_fa, args.bam1, args.bam2]
@@ -118,91 +132,6 @@ def runOVar(args):
                                 outputString = outputString + '\n'
                                 outputFile.writelines(outputString)
                                 logging.info("=======================================")
-                            else:
-                                logging.info("=======================================")
-                                logging.info("position is filtered after overlap filtering")
-                                logging.info("position : " + str([TYPE, Chr, pos, ref, obs]))
-                                logging.info("tumor piled : " + str(bodyT))
-                                logging.info("normal piled : " + str(bodyN))
-                                logging.info("=======================================")
-                                continue
-                except CliticalTypeException, e:
-                    logging.error('clitical exception : ' + str(line))
-                    raise e
-                except WarningTypeException, e:
-                    logging.warning(
-                        'Because of warning type exception of ' + str(type(e)) + ' passed this line : ' + str(line))
-                    continue
-    elif args.bam2 is None:
-        filterParamsT = {}
-        filterParamsT.update(dict(config.items('tumor')))
-        # filterParamsT['minBQ'] = args.base_quality
-
-        filterTumor = PileUpFilter(filterParamsT)
-
-        ovarCall = None
-        settingOVar = {}
-        settingOVar['minMapQ'] = 30
-        settingOVar.update(dict(config.items('calculation')))
-
-        # settingOVar['minBQ'] = args.base_quality
-        # settingOVar['minMapQ'] = args.mapping_quality
-        ovarCall = OVarCall(settingOVar)
-        tumorBamDao = BamDAO(args.bam1, settingOVar)
-
-        with tumorBamDao.openBam(), open(args.output, 'wb') as outputFile, open(os.devnull, 'wb') as FNULL:
-            cmd_list = [args.samtools_path, 'mpileup', '-q',
-                        str(settingOVar['minMapQ']), '-BQ', '0', '-d', '10000000', '-f', args.ref_fa, args.bam1]
-            if args.region:
-                cmd_list.insert(2, '-r')
-                cmd_list.insert(3, args.region)
-            pileup = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=FNULL)
-            end_of_pipe = pileup.stdout
-            lineCount = 0
-            for line in end_of_pipe:
-                try:
-                    lineCount += 1
-                    if lineCount % 50000000 == 0:
-                        logging.info('processed ' + str(lineCount) + ' line ')
-
-                    line = line.replace('\n', '')
-                    line = line.replace('\r', '')
-                    lineCols = re.split('\t', line)
-
-                    Chr = lineCols[0]
-                    pos = lineCols[1]
-                    ref = lineCols[2].upper()
-                    depth = lineCols[3]
-                    bases = lineCols[4]
-                    qualities = lineCols[5]
-
-                    candidate = filterTumor.satisfiedAll(Chr, pos, ref, depth, bases, qualities)
-                    if candidate is None:
-                        continue
-
-                    for TYPE in 'MID':
-                        for obs in candidate[TYPE]:
-                            headT, bodyT = tumorBamDao.getOverlapInformation(
-                                TYPE, Chr, pos, ref, obs)
-
-                            if headT is None and bodyT is None:
-                                # Cannot get read in tumor sample.
-                                continue
-
-                            if filterTumor.filterOverlapPiled(headT, bodyT):
-                                logging.info("=======================================")
-                                logging.info("position is evaluated by OVarCall Model")
-                                logging.info("position : " + str([TYPE, Chr, pos, ref, obs]))
-                                logging.info("tumor overlap piled : " + str(bodyT))
-                                logging.info("normal overlap piled : " + str(bodyN))
-                                logging.info("=======================================")
-
-                                ansList = ovarCall.doInference(
-                                    TYPE, Chr, pos, ref, obs, headT, bodyT)
-                                outputString = '\t'.join(map(str, ansList))
-                                outputString = outputString.replace('\n', '')
-                                outputString = outputString + '\n'
-                                outputFile.writelines(outputString)
                             else:
                                 logging.info("=======================================")
                                 logging.info("position is filtered after overlap filtering")

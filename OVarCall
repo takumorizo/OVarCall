@@ -17,7 +17,6 @@ parser.add_argument('-s', '--samtools_path', type=str, default=None, required=Tr
 parser.add_argument('-p', '--parameter_settings', help="parameter settings path (.ini) ", type=str, default=None,required=True)
 parser.add_argument('-R', '--region', help='region in which pileup is generated', type=str, default=None)
 parser.add_argument('-l', '--log_level', help="Logging level", type=str, default='INFO')
-parser.add_argument('-u','--unUseNormal',help="Not using Normal bam for statistical inference. Normal bam is used for candidate position filtering", dest='unUseNormal', action='store_true',default=False)
 
 
 ####################
