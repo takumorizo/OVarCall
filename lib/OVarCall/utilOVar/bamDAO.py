@@ -73,8 +73,6 @@ class BamDAO:
                 self.__maxLowBQVariantProportion = float(settings['maxLowBQVariantProportion'])
             if 'lowBQ' in settings:
                 self.__lowBQ = int(settings['lowBQ'])
-        logging.info('maxLowBQVariantNum : ' +str(self.__maxLowBQVariantNum))
-        logging.info('maxLowBQVariantProportion : ' +str(self.__maxLowBQVariantProportion))
         
     @contextlib.contextmanager
     def openBam(self,bamPath=None):
@@ -95,12 +93,10 @@ class BamDAO:
         self.__bam = None
 
     def __filterReads(self,reads,TYPE,Chr,pos,ref,obs):
-        # logging.info("filter position " + str([TYPE,Chr,pos,ref,obs]) )
         numAll = 0
         numFiltered = 0
         readList = []
 
-        # allReadsNum = len(reads)
         indelReadsNum = 0
         for read in reads:
             if self.__filterFlaggedRead(read) :
@@ -120,15 +116,11 @@ class BamDAO:
         if not(proportionLowMap <= self.__maxLowMapReadProportion):
             readList = None
         if self.__nearestIndelDistance > 0 and not(indelReadsNum <= self.__nearestIndelReadThres ):
-            # logging.info(str(TYPE)+' '+str(Chr)+" "+str(pos)+' '+str(ref)+' '+str(obs) + ': is filtered because of nearest indel filter')
             readList = None
         if self.__maxLowBQVariantNum > 0 and self.__maxLowBQVariantProportion < 1.0 and TYPE == 'M':
             profile = self.__getVariantReadBQProfile(ref, obs, Chr, pos, TYPE, self.__lowBQ, reads)
             if not self.__filterByVariantReadBQ(TYPE, profile, self.__maxLowBQVariantProportion, self.__maxLowBQVariantNum):
-                logging.info(str(Chr)+" " + str(pos) + " " + TYPE + " " + str(ref) + " " + str(obs) + " : low bq variant pos fitered" )
-                logging.info(str(profile))
                 readList = None
-    # def __getVariantReadBQProfile(self, ref, obs, Chr, pos, obsType, minBQ, readBuffer):
         return readList
 
     def __filterLowMapRead(self,alignedSeg,TYPE,Chr,pos,ref,obs):
@@ -487,7 +479,6 @@ class BamDAO:
                         ansDic['low'] += 1
                     else :
                         ansDic['high'] += 1
-        logging.info(str(ansDic))
         
         return ansDic
 

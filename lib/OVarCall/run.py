@@ -55,6 +55,9 @@ def runOVar(args):
         pileup = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=FNULL)
         end_of_pipe = pileup.stdout
         lineCount = 0
+
+        outputFile.writelines("TYPE\tchr\tpos\tref\tobs\tscoreWithOverlap\tscoreWithoutOverlap\tTumorPileup≠\tNormalPileup\n")
+        
         for line in end_of_pipe:
             try:
                 lineCount += 1
@@ -97,23 +100,21 @@ def runOVar(args):
                             continue
 
                         if filterTumor.filterOverlapPiled(headT, bodyT) and filterNormal.filterOverlapPiled(headN, bodyN):
-                            ansList = None
                             logging.info("=======================================")
                             logging.info("position is evaluated by OVarCall Model")
                             logging.info("position : " + str([TYPE, Chr, pos, ref, obs]))
                             logging.info("tumor overlap piled : " + str(bodyT))
                             logging.info("normal overlap piled : " + str(bodyN))
                             
-                            if args.unUseNormal:
-                                logging.info("start calc using only tumor ")
-                                ansList = ovarCall.doInference(
-                                    TYPE, Chr, pos, ref, obs, headT, bodyT)
-                            else:
-                                logging.info("start calc using normal and tumor ")
-                                ansList = ovarCall.doInference(
-                                    TYPE, Chr, pos, ref, obs, headT, bodyT, bodyN)
+                            logging.info("start calc using normal and tumor ")
+                            ansDic = ovarCall.doInference(
+                                TYPE, Chr, pos, ref, obs, headT, bodyT, bodyN)
 
-                            outputString = '\t'.join(map(str, ansList))
+                            bodyT = ','.join(map(str, bodyT))
+                            bodyN = ','.join(map(str, bodyN))
+
+                            outputList = [TYPE, Chr, pos, ref, obs,ansDic["withOver"],ansDic["withoutOver"],bodyT,bodyN]
+                            outputString = '\t'.join(map(str, outputList))
                             outputString = outputString.replace('\n', '')
                             outputString = outputString + '\n'
                             outputFile.writelines(outputString)

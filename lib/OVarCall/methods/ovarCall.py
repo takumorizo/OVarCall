@@ -70,68 +70,23 @@ class OVarCall():
             if 'useNormal' in settings:
                 self.__useNormal = bool( distutils.util.strtobool( str(settings['useNormal']) ) )
 
-    def doInference(self, TYPE, Chr, pos, ref, obs, head,bodyT,bodyN=None):
+    def doInference(self, TYPE, Chr, pos, ref, obs, head,bodyT,bodyN):
         countColFromT = None
         countColFromN = None
         countColFromT = 5
         countColFromN = 21
         if TYPE not in 'MID' :
             raise InvalidMutationType
-        
-        if bodyN is None:
-            result = head
-            result.extend(bodyT)
-            result.extend(self.__startCalculationT(0,countColFromT,result))
-            result.extend(self.__startCalculationT(0,countColFromT,result,True))
-            return result
-        else :
-            result = []
-            result = head
-            result.extend(bodyT)
-            result.append('Normal:')
-            result.extend(bodyN)
-            if bodyN is not None:
-                result.extend(self.__startCalculationTN(0,countColFromT,countColFromN,result))
-                result.extend(self.__startCalculationTN(0,countColFromT,countColFromN,result,True))
-            else :
-                result.extend(self.__startCalculationT(0,countColFromT,result))
-                result.extend(self.__startCalculationT(0,countColFromT,result,True))
-            return result   
-
-    def __startCalculationT(self,mutCol,countColFromTumor,inputCols,ignoreOverlap=False):
-        mutType = inputCols[mutCol]
-        tumorCols = None
-        tumorCols = inputCols[countColFromTumor:countColFromTumor+15]
-        tumorCols = map(int,tumorCols)
-        if ignoreOverlap:
-            tumorCols[6:15] = [0]*9
-        ErrorLq = self.__baseModelsLowerBound(tumorCols[0],tumorCols[1],tumorCols[2],\
-            tumorCols[3],tumorCols[4],tumorCols[5],\
-            tumorCols[6],tumorCols[7],tumorCols[8],\
-            tumorCols[9],tumorCols[10],tumorCols[11],\
-            tumorCols[12],tumorCols[13],tumorCols[14],\
-            self.__DEL_P1_ERROR,self.__DEL_P2_ERROR,self.__DEL_M1_ERROR,self.__DEL_M2_ERROR\
-            ,self.__GAMMA_ERROR)['Lq']
-        TumorLq = self.__baseModelsLowerBound(tumorCols[0],tumorCols[1],tumorCols[2],\
-            tumorCols[3],tumorCols[4],tumorCols[5],\
-            tumorCols[6],tumorCols[7],tumorCols[8],\
-            tumorCols[9],tumorCols[10],tumorCols[11],\
-            tumorCols[12],tumorCols[13],tumorCols[14],\
-            self.__DEL_P1_TUMOR,self.__DEL_P2_TUMOR,self.__DEL_M1_TUMOR,self.__DEL_M2_TUMOR,\
-            self.__GAMMA_TUMOR)['Lq']
-
-        outputCols = []
-        # outputCols.extend(inputCols)
-        if ErrorLq >= TumorLq:
-            outputCols.append('E')
-        else :
-            outputCols.append('T')
-        outputCols.append(math.log10(math.e)*ErrorLq)
-        outputCols.append(math.log10(math.e)*TumorLq)
-        outputCols.append(math.log10(math.e)*(TumorLq-ErrorLq))
-        return outputCols
-        if mutType not in 'MID' :
-            raise InvalidMutationType
+            
+        result = []
+        result = head
+        result.extend(bodyT)
+        result.append('Normal:')
+        result.extend(bodyN)
+        ans = {"withOver":-100,"withoutOver":-100}
+        ans["withOver"] = self.__startCalculationTN(0,countColFromT,countColFromN,result)
+        ans["withoutOver"] = self.__startCalculationTN(0,countColFromT,countColFromN,result,True)
+        return ans   
 
     def __startCalculationTN(self,mutCol,countColFromTumor,countColFromNormal,inputCols,ignoreOverlap=False):
         mutType = inputCols[mutCol]
@@ -192,15 +147,8 @@ class OVarCall():
             tumorCols[12],tumorCols[13],tumorCols[14],\
             tumorError['eps+'][0],tumorError['eps+'][1],tumorError['eps-'][0],tumorError['eps-'][1],\
             gam_Tumor)['Lq']
-        outputCols = []
-        if ErrorLq >= TumorLq:
-            outputCols.append('E')
-        else :
-            outputCols.append('T')
-        outputCols.append(math.log10(math.e)*ErrorLq)
-        outputCols.append(math.log10(math.e)*TumorLq)
-        outputCols.append(math.log10(math.e)*(TumorLq-ErrorLq))
-        return outputCols
+        ans = math.log10(math.e)*(TumorLq-ErrorLq)
+        return ans
 
 
 
