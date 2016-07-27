@@ -27,6 +27,9 @@ class OVarCall():
         
         self.__GAMMA_TUMOR = [1.0, 1.0]
         self.__GAMMA_ERROR = [1000000.0, 10.0]
+        self.__SNV_PRIOR = 0.001
+        self.__INDEL_PRIOR = 0.0001
+
         self.setParameters(settings)
         
 
@@ -67,8 +70,10 @@ class OVarCall():
             if 'GAMMA_ERROR_BETA' in settings:
                 self.__GAMMA_ERROR[1] = float(settings['GAMMA_ERROR_BETA'])
 
-            if 'useNormal' in settings:
-                self.__useNormal = bool( distutils.util.strtobool( str(settings['useNormal']) ) )
+            if 'SNV_PRIOR' in settings:
+                self.__SNV_PRIOR = float(settings['SNV_PRIOR'])
+            if 'INDEL_PRIOR' in settings:
+                self.__INDEL_PRIOR = float(settings['INDEL_PRIOR'])   
 
     def doInference(self, TYPE, Chr, pos, ref, obs, head,bodyT,bodyN):
         countColFromT = None
@@ -84,9 +89,14 @@ class OVarCall():
         result.append('Normal:')
         result.extend(bodyN)
         ans = {"withOver":-100,"withoutOver":-100}
-        ans["withOver"] = self.__startCalculationTN(0,countColFromT,countColFromN,result)
-        ans["withoutOver"] = self.__startCalculationTN(0,countColFromT,countColFromN,result,True)
-        return ans   
+        prior = 0.0
+        if TYPE == 'M':
+            prior = math.log10(self.__SNV_PRIOR)
+        elif TYPE == 'D' or TYPE == 'I':
+            prior = math.log10(self.__INDEL_PRIOR)
+        ans["withOver"] = prior + self.__startCalculationTN(0,countColFromT,countColFromN,result)
+        ans["withoutOver"] = prior + self.__startCalculationTN(0,countColFromT,countColFromN,result,True)
+        return ans
 
     def __startCalculationTN(self,mutCol,countColFromTumor,countColFromNormal,inputCols,ignoreOverlap=False):
         mutType = inputCols[mutCol]
