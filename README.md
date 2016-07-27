@@ -42,3 +42,17 @@ OVarCall [-h] [--version] -1 BAM1 -2 BAM2 -o OUTPUT -r REF_FA -s SAMTOOLS_PATH -
 -l: Loglevel, ex) CRITICAL,ERROR,WARNING,INFO,DEBUG.
 ```
 
+You can use filter mode, and scores are added.
+```
+OVarFilter [-h] [--version] -1 BAM1 -2 BAM2 -i INPUT -o OUTPUT -r REF_FA -p PARAMETER_SETTINGS [-f] [-l LOG_LEVEL] [-a]
+
+-1: Input tumor bam path.
+-2: Input normal bam path.
+-i; Input vcf or annovar file path.
+-a: set this option when you set annovar file in -i.
+-o: Output file path.
+-f: Activate pileup filter.
+-r: Reference fasta file path.
+-p: Parameter settings path , ex) ./OVarCall.ini.
+-l: Loglevel, ex) CRITICAL,ERROR,WARNING,INFO,DEBUG.
+```
