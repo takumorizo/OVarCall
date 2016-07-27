@@ -16,7 +16,7 @@ OVarCall: Bayesian mutation calling method utilizing overlapping paired-end read
 samtools 
 
 ## Python
-Python(>=2.7), pysam, scipy
+Python(>=2.7), pysam, scipy,pyVCF
 
 
 ##  Install
