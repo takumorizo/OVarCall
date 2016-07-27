@@ -3,7 +3,7 @@
 # Motivation
 Detection of somatic SNVs of low allele frequency (under 7%) in exome sequence data is stil difficult.
 Overlapping paired-end read is reported to be important for detection of mutations of low allele frequency in PCR targeted deep sequence, so usage of these information is expected to be important.
-However, this mutation caller uses only overlapping paired-end reads and was not designed for usual exome sequence data that include overlapping and non-overlapping paired-end reads.
+However, existing methods for PCR targeted deep sequence data use only overlapping paired-end reads and was not designed for usual exome sequence data that include overlapping and non-overlapping paired-end reads.
 We constructed a Bayesian hierarchical method, OVarCall, for the detection of somatic mutations with low allele frequencies from exome sequence data.
 
 
