@@ -29,6 +29,7 @@ python setup.py install
 
 
 ## Run
+You can use OVarCall from Tumor bam and Normal bam.
 ```
 OVarCall [-h] [--version] -1 BAM1 -2 BAM2 -o OUTPUT -r REF_FA -s SAMTOOLS_PATH -p PARAMETER_SETTINGS [-R REGION] [-l LOG_LEVEL]
 
@@ -42,7 +43,7 @@ OVarCall [-h] [--version] -1 BAM1 -2 BAM2 -o OUTPUT -r REF_FA -s SAMTOOLS_PATH -
 -l: Loglevel, ex) CRITICAL,ERROR,WARNING,INFO,DEBUG.
 ```
 
-You can use filter mode, and scores are added.
+You can also use OVarCall from analysed vcf file or annovar file, and scores are added.
 ```
 OVarFilter [-h] [--version] -1 BAM1 -2 BAM2 -i INPUT -o OUTPUT -r REF_FA -p PARAMETER_SETTINGS [-f] [-l LOG_LEVEL] [-a]
 
@@ -55,4 +56,17 @@ OVarFilter [-h] [--version] -1 BAM1 -2 BAM2 -i INPUT -o OUTPUT -r REF_FA -p PARA
 -r: Reference fasta file path.
 -p: Parameter settings path , ex) ./OVarCall.ini.
 -l: Loglevel, ex) CRITICAL,ERROR,WARNING,INFO,DEBUG.
+```
+
+## Output format
+The meaning of output is as follows.
+```
+TYPE : M(SNV), I(Insertion), D(Deletion)
+Chr : Chromosome
+pos : 1-indexed position
+ref : base @ position
+obs : altered base(TYPE == M), inserted base(TYPE == I), deleted base(TYPE == D).
+scoreWithOverlap : log_10_Bayes_factor, considering overlap
+scoreWithoutOverlap : log_10_Bayes_factor, ignoring overlap
+TumorPileup, NormalPileup: Ref+,Obs+,Other+,Ref-,Obs-,Other-,RefRef,RefObs,RefOther,ObsRef,ObsObs,ObsOther,OtherRef,OtherObs,OtherOther
 ```
