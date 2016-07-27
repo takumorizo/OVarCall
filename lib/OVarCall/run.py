@@ -51,7 +51,7 @@ def runOVar(args):
         end_of_pipe = pileup.stdout
         lineCount = 0
 
-        outputFile.writelines("TYPE\tchr\tpos\tref\tobs\tscoreWithOverlap\tscoreWithoutOverlap\tTumorPileup≠\tNormalPileup\n")
+        outputFile.writelines("TYPE\tchr\tpos\tref\tobs\tscoreWithOverlap\tscoreWithoutOverlap\tTumorPileup\tNormalPileup\n")
         for line in end_of_pipe:
             try:
                 lineCount += 1
