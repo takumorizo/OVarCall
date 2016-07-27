@@ -10,6 +10,6 @@ setup(name='OVarCall',
       url='',
       package_dir={'': 'lib'},
       packages=['OVarCall', 'OVarCall.filter', 'OVarCall.methods', 'OVarCall.utilOVar'],
-      scripts=['OVarCall'],
+      scripts=['OVarCall','OVarFilter'],
       license='GPL-3'
       )
