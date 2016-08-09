@@ -73,7 +73,15 @@ class BamDAO:
                 self.__maxLowBQVariantProportion = float(settings['maxLowBQVariantProportion'])
             if 'lowBQ' in settings:
                 self.__lowBQ = int(settings['lowBQ'])
-        
+        logging.info('maxLowBQVariantNum : ' +str(self.__maxLowBQVariantNum))
+        logging.info('maxLowBQVariantProportion : ' +str(self.__maxLowBQVariantProportion))
+      
+    def getHeaderDic(self):
+        if self.__bam is not None:
+            return copy.deepcopy(self.__bam.header)
+        else :
+            return None
+
     @contextlib.contextmanager
     def openBam(self,bamPath=None):
         try:
