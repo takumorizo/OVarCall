@@ -158,6 +158,7 @@ class PileUpFilter(object):
         ####################################
 
         if addedNum > 0:
+            # logging.info("pre-check satisfied list: " +  str(satisfiedList))
             return self.__filterSatisfy(satisfiedList, detailSNV, detailInDel, self.__pileUp.ref)
         else:
             return None
@@ -195,14 +196,26 @@ class PileUpFilter(object):
                     self.__minRefNum <= refNum <= self.__maxRefNum and \
                     self.__minRefNumPlus <= refNumPlus <= self.__maxRefNumPlus and \
                     self.__minRefNumMinus <= refNumMinus <= self.__maxRefNumMinus:
+                # logging.info("depth ok")
                 for base in satisfiedList['M']:
                     obsNum = detailSNV[base.upper()] + detailSNV[base.lower()]
                     obsNumPlus = detailSNV[base.upper()]
                     obsNumMinus = detailSNV[base.lower()]
 
+                    # logging.info( "base : " + base)
                     if not(self.__minObsNum <= obsNum <= self.__maxObsNum and
                            self.__minObsNumPlus <= obsNumPlus <= self.__maxObsNumPlus and
                            self.__minObsNumMinus <= obsNumMinus <= self.__maxObsNumMinus):
+                        # logging.info("obs num filtered")
+                        # logging.info( str(obsNum) + " : obsNum")
+                        # logging.info( str(obsNumPlus) + " : obsNumPlus")
+                        # logging.info( str(obsNumMinus) + " : obsNumMinus")
+                        # logging.info( str(self.__minObsNum) + " : self.__minObsNum")
+                        # logging.info( str(self.__maxObsNum) + " : self.__maxObsNum")
+                        # logging.info( str(self.__minObsNumPlus) + " : self.__minObsNumPlus")
+                        # logging.info( str(self.__maxObsNumPlus) + " : self.__maxObsNumPlus")
+                        # logging.info( str(self.__minObsNumMinus) + " : self.__minObsNumMinus")
+                        # logging.info( str(self.__maxObsNumMinus) + " : self.__maxObsNumMinus")
                         continue
 
                     obsRate = 0.0
@@ -217,6 +230,21 @@ class PileUpFilter(object):
                     if not(self.__minRate <= obsRate <= self.__maxRate and
                            self.__minRatePlus <= obsRatePlus <= self.__maxRatePlus and
                            self.__minRateMinus <= obsRateMinus <= self.__maxRateMinus):
+                        # logging.info("obs rate filtered")
+                        # logging.info( str(obsRate) + " : obsRate")
+                        # logging.info( str(obsRatePlus) + " : obsRatePlus")
+                        # logging.info( str(obsRateMinus) + " : obsRateMinus")
+
+                        # logging.info( str(depth) + " : depth")
+                        # logging.info( str(depthPlus) + " : depthPlus")
+                        # logging.info( str(depthMinus) + " : depthMinus")
+
+                        # logging.info( str(self.__minRate) + " : self.__minRate")
+                        # logging.info( str(self.__maxRate) + " : self.__maxRate")
+                        # logging.info( str(self.__minRatePlus) + " : self.__minRatePlus")
+                        # logging.info( str(self.__maxRatePlus) + " : self.__maxRatePlus")
+                        # logging.info( str(self.__minRateMinus) + " : self.__minRateMinus")
+                        # logging.info( str(self.__maxRateMinus) + " : self.__maxRateMinus")
                         continue
 
                     ans['M'].append(base.upper())
@@ -253,6 +281,7 @@ class PileUpFilter(object):
                     self.__minRefNum <= refNum <= self.__maxRefNum and \
                     self.__minRefNumPlus <= refNumPlus <= self.__maxRefNumPlus and \
                     self.__minRefNumMinus <= refNumMinus <= self.__maxRefNumMinus:
+                # logging.info("depth ok")
                 for indel in 'ID':
                     for bases in satisfiedList[indel]:
                         obsNumPlus = 0
@@ -267,6 +296,7 @@ class PileUpFilter(object):
                         if not(self.__minObsNum <= obsNum <= self.__maxObsNum and
                                self.__minObsNumPlus <= obsNumPlus <= self.__maxObsNumPlus and
                                self.__minObsNumMinus <= obsNumMinus <= self.__maxObsNumMinus):
+                            # logging.info("obs num filtered")
                             continue
 
                         obsRate = 0.0
@@ -282,6 +312,7 @@ class PileUpFilter(object):
                         if not(self.__minRate <= obsRate <= self.__maxRate and
                                self.__minRatePlus <= obsRatePlus <= self.__maxRatePlus and
                                self.__minRateMinus <= obsRateMinus <= self.__maxRateMinus):
+                            # logging.info("obs rate filtered")
                             continue
 
                         ans[indel].append(bases.upper())

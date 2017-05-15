@@ -35,9 +35,10 @@ class BamDAO:
         self.__nearestIndelReadThres = 20   # number of near indel read thres.
 
         # parameter for BQ variant read filter
-        self.__maxLowBQVariantNum = -1
-        self.__maxLowBQVariantProportion = 1.0
+        # self.__maxLowBQVariantNum = -1
+        # self.__maxLowBQVariantProportion = 1.0
         self.__lowBQ = 15
+        self.__minAvgBaseQuality = -1
 
         self.setParameters(settings)
 
@@ -67,14 +68,17 @@ class BamDAO:
                 self.__nearestIndelDistance = int(settings['nearestIndelDistance'])
             if 'nearestIndelReadThres' in settings:
                 self.__nearestIndelReadThres = int(settings['nearestIndelReadThres'])
-            if 'maxLowBQVariantNum' in settings:
-                self.__maxLowBQVariantNum = int(settings['maxLowBQVariantNum'])
-            if 'maxLowBQVariantProportion' in settings:
-                self.__maxLowBQVariantProportion = float(settings['maxLowBQVariantProportion'])
             if 'lowBQ' in settings:
                 self.__lowBQ = int(settings['lowBQ'])
-        logging.info('maxLowBQVariantNum : ' +str(self.__maxLowBQVariantNum))
-        logging.info('maxLowBQVariantProportion : ' +str(self.__maxLowBQVariantProportion))
+            if 'minAvgBaseQuality' in settings:
+                self.__minAvgBaseQuality = int(settings['minAvgBaseQuality'])
+            # if 'maxLowBQVariantNum' in settings:
+            #     self.__maxLowBQVariantNum = int(settings['maxLowBQVariantNum'])
+            # if 'maxLowBQVariantProportion' in settings:
+            #     self.__maxLowBQVariantProportion = float(settings['maxLowBQVariantProportion'])
+
+        # logging.info('maxLowBQVariantNum : ' +str(self.__maxLowBQVariantNum))
+        # logging.info('maxLowBQVariantProportion : ' +str(self.__maxLowBQVariantProportion))
       
     def getHeaderDic(self):
         if self.__bam is not None:
@@ -125,10 +129,13 @@ class BamDAO:
             readList = None
         if self.__nearestIndelDistance > 0 and not(indelReadsNum <= self.__nearestIndelReadThres ):
             readList = None
-        if self.__maxLowBQVariantNum > 0 and self.__maxLowBQVariantProportion < 1.0 and TYPE == 'M':
-            profile = self.__getVariantReadBQProfile(ref, obs, Chr, pos, TYPE, self.__lowBQ, reads)
-            if not self.__filterByVariantReadBQ(TYPE, profile, self.__maxLowBQVariantProportion, self.__maxLowBQVariantNum):
+        if self.__minAvgBaseQuality > 0 and TYPE == 'M':
+            profile = self.__getReadBQProfile(ref, obs, Chr, pos, TYPE, self.__lowBQ, reads)
+            if not( self.__minAvgBaseQuality <= profile['avg']):
+                logging.info(str(Chr)+" " + str(pos) + " " + TYPE + " " + str(ref) + " " + str(obs) + " : low avg bq variant pos fitered" )
+                logging.info(str(profile))
                 readList = None
+        
         return readList
 
     def __filterLowMapRead(self,alignedSeg,TYPE,Chr,pos,ref,obs):
@@ -137,19 +144,15 @@ class BamDAO:
 
         delNum = self.__delNum(alignedSeg)
         insNum = self.__insNum(alignedSeg)
-        if not(delNum <= self.__maxInsDel):
-            return False
-        if not(insNum <= self.__maxInsDel):
-            return False
-        if not(delNum + insNum + 1 <= self.__maxMutAll):
+        if not(delNum + insNum <= self.__maxInsDel):
             return False
 
         if not(self.__softClipProportion(alignedSeg) <= self.__maxSCProportion):
             return False
         snvNum = self.__snvNum(alignedSeg)
-        if not(delNum + insNum + snvNum <= self.__maxMutAll):
-            return False
         if not(snvNum <= self.__maxSNV):
+            return False
+        if not(delNum + insNum + snvNum <= self.__maxMutAll):
             return False
         return True
 
@@ -471,6 +474,31 @@ class BamDAO:
           'ObR+-':ObR,'ObOb+-':ObOb,'ObOt+-':ObOt, \
           'OtR+-':OtR,'OtOb+-':OtOb,'OtOt+-':OtOt}
 
+    def __getReadBQProfile(self, ref, obs, Chr, pos, obsType, minBQ, readBuffer):
+        ansDic = {'high':0,'low':0, 'avg':0}
+        readNumAll = 0
+        if obsType != 'M':
+            return ansDic
+
+        if readBuffer is None:
+            return ansDic
+
+        for read in readBuffer:
+            mappedDic = self.__makeMappedDic(read)
+            if (Chr,pos) in mappedDic:
+                if mappedDic[(Chr,pos)]['cigar'] == 0:
+                    readNumAll +=1
+                    ansDic['avg'] += mappedDic[(Chr,pos)]['bq']
+
+                    if mappedDic[(Chr,pos)]['bq'] < minBQ:
+                        ansDic['low'] += 1
+                    else :
+                        ansDic['high'] += 1
+        # logging.info(str(ansDic))
+        if readNumAll > 0:
+            ansDic['avg'] /= (1.0 * readNumAll)
+        return ansDic
+
     def __getVariantReadBQProfile(self, ref, obs, Chr, pos, obsType, minBQ, readBuffer):
         ansDic = {'high':0,'low':0}
         if obsType != 'M':
@@ -487,11 +515,12 @@ class BamDAO:
                         ansDic['low'] += 1
                     else :
                         ansDic['high'] += 1
-        
+        logging.info(str(ansDic))
+
         return ansDic
 
 
-    def __filterByVariantReadBQ(self, obsType,bqProfile, maxLowProportion, maxLowNum):
+    def __filterByVariantReadBQ(self, obsType, bqProfile, maxLowProportion, maxLowNum):
         if obsType != 'M':
             return True # passing this filter when I or D
         proportion = 0.0
