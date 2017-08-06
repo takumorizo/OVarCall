@@ -7,7 +7,7 @@ import argparse
 # top level parser
 #
 parser = argparse.ArgumentParser(prog="OVarCall")
-parser.add_argument("--version", action="version", version="OVarCall-0.1.0")
+parser.add_argument("--version", action="version", version="OVarCall-0.1.1")
 
 parser.add_argument('-1', '--bam1', help='1st bam file ( disease )', type=str, default=None, required=True)
 parser.add_argument('-2', '--bam2', help='2nd bam file ( control )', type=str, default=None, required=True)

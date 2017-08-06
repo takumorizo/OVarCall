@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='OVarCall',
-      version='0.1.0',
+      version='0.1.1',
       description='Python tools to identify somatic mutations, using overlapping read information.',
       author='Takuya Moriyama',
       author_email='moriyama@hgc.jp',
