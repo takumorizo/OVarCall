@@ -8,6 +8,7 @@ import re
 import ConfigParser
 import vcf
 import pysam
+import traceback
 
 def runOVarFilter(args):
     if args.annovarFile:

@@ -2,13 +2,13 @@
 import subprocess
 from OVarCall.methods.ovarCall import OVarCall
 from OVarCall.utilOVar.exceptionUtil import *
-# from OVarCall.filter.pileUp import *
 from OVarCall.filter.pileUpFilter import PileUpFilter
 from OVarCall.utilOVar.bamDAO import BamDAO
 import logging
 import os
 import re
 import ConfigParser
+import traceback
 
 
 def runOVar(args):
